@@ -1,6 +1,18 @@
 {
-  "name": "Iqra Radio Companion",
-  "description": "A premium digital radio experience for Radio Iqra BF, featuring live streaming, program schedules, and a Gemini-powered spiritual companion for deep insights into Islamic programming.",
+  "name": "Radio Iqra BF",
+  "short_name": "Iqra BF",
+  "description": "La Voix du Saint Coran en direct de Ouagadougou. Compagnon spirituel intégré et programmation complète.",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#064e3b",
+  "background_color": "#064e3b",
   "requestFramePermissions": [
     "microphone"
   ]

@@ -11,20 +11,31 @@ const Visualizer: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
     if (!ctx) return;
 
     let animationId: number;
-    const bars = 32;
+    const bars = 40;
     const barWidth = canvas.width / bars;
     const heights = new Array(bars).fill(0).map(() => Math.random() * 40);
 
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#10b981'; // emerald-500
+      
+      // Dégradé du vert vers l'or
+      const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+      gradient.addColorStop(0, '#10b981'); // Emerald
+      gradient.addColorStop(1, '#d4af37'); // Gold
+
+      ctx.fillStyle = gradient;
 
       for (let i = 0; i < bars; i++) {
         const target = isPlaying ? Math.random() * 40 + 5 : 2;
-        heights[i] += (target - heights[i]) * 0.1;
+        heights[i] += (target - heights[i]) * 0.15;
         const x = i * barWidth;
         const h = heights[i];
-        ctx.fillRect(x + 2, canvas.height - h, barWidth - 4, h);
+        
+        // Arrondir les barres pour un look plus moderne
+        const radius = 2;
+        ctx.beginPath();
+        ctx.roundRect(x + 2, canvas.height - h, barWidth - 4, h, [radius, radius, 0, 0]);
+        ctx.fill();
       }
       animationId = requestAnimationFrame(render);
     };
@@ -33,7 +44,7 @@ const Visualizer: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
     return () => cancelAnimationFrame(animationId);
   }, [isPlaying]);
 
-  return <canvas ref={canvasRef} width={300} height={50} className="w-full h-12 opacity-50" />;
+  return <canvas ref={canvasRef} width={400} height={60} className="w-full h-12 opacity-80" />;
 };
 
 export default Visualizer;

@@ -1,34 +1,75 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RADIO IQRA BF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Radio Iqra BF 96.1 MHz | La Voix du Saint Coran</title>
+    <meta name="description" content="Écoutez Radio Iqra BF en direct. Votre radio islamique à Ouagadougou avec streaming HD et compagnon spirituel IA.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Radio Iqra BF - La Voix du Saint Coran">
+    <meta property="og:description" content="Streaming direct et compagnon spirituel intelligent.">
+    <meta property="og:image" content="https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root { 
+            --emerald-deep: #022c22; 
+            --gold-accent: #d4af37;
+            --cream-soft: #fcf8f1;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #064e3b; /* deep emerald */
+            background-color: var(--emerald-deep);
+            /* Motif géométrique islamique subtil */
+            background-image: url("https://www.transparenttextures.com/patterns/islamic-art.png");
+            color: var(--cream-soft);
+            margin: 0;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        .font-arabic {
-            font-family: 'Amiri', serif;
+        .font-arabic { font-family: 'Amiri', serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-accent); border-radius: 10px; }
+        
+        /* Animation for Live Pulse */
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        .animate-live-badge { animation: pulse-live 2s infinite; }
+
+        .glass-panel {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
     </style>
-<script type="importmap">
+
+    <script type="importmap">
 {
   "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
