@@ -1,0 +1,41 @@
+
+{
+  "version": 2,
+  "routes": [
+    {
+      "source": "/metadata.json",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/manifest+json"
+      },
+      "dest": "/metadata.json"
+    },
+    {
+      "source": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}

@@ -11,11 +11,7 @@ import { askSpiritualCompanion } from './services/geminiService';
 import Visualizer from './components/Visualizer';
 
 const INFOMANIAK_CONFIG = {
-  // Votre URL de flux Infomaniak
   STREAM_URL: "https://radioiqra.ice.infomaniak.ch/radioiqra-128.mp3",
-  // URL optionnelle pour les métadonnées (Icecast JSON)
-  METADATA_URL: "https://radioiqra.ice.infomaniak.ch/status-json.xsl",
-  
   SOCIAL_LINKS: [
     { name: 'Site Web', icon: Globe, url: 'https://radioiqra.bf' },
     { name: 'Facebook', icon: Facebook, url: 'https://facebook.com/radioiqrabf' },
@@ -26,7 +22,7 @@ const INFOMANIAK_CONFIG = {
     { id: '2', time: '11:00', title: 'Lecture du Coran - Juz 15', duration: '60:00', link: 'https://archive.org/details/coran-iqra' },
     { id: '3', time: '10:00', title: 'Leçons de Vie Islamique', duration: '30:00', link: 'https://radioiqra.bf/replays/123' },
     { id: '4', time: '09:00', title: 'Émission Spéciale Jeunesse', duration: '45:00', link: '#' },
-    { id: '5', time: '07:00', title: 'Invocations du Matin', duration: '30:00', link: 'https://www.youtube.com/watch?v=example' },
+    { id: '5', time: '07:00', title: 'Invocations du Matin', duration: '30:00', link: '#' },
   ]
 };
 
@@ -44,23 +40,14 @@ const App: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Gestion des métadonnées (Simulation ou Fetch réel)
   useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        // Note: En production, assurez-vous que le serveur Icecast autorise le CORS
-        // const res = await fetch(INFOMANIAK_CONFIG.METADATA_URL);
-        // const data = await res.json();
-        // setNowPlaying(data.icestats.source.title || "Radio Iqra BF");
-      } catch (e) {
-        console.warn("Impossible de charger les métadonnées temps réel");
-      }
-    };
-
-    const interval = setInterval(fetchMetadata, 30000);
-    fetchMetadata();
-    return () => clearInterval(interval);
-  }, []);
+    // Met à jour le titre du document si la radio joue
+    if (playerState === PlayerState.PLAYING) {
+      document.title = `▶ En Direct - Radio Iqra BF`;
+    } else {
+      document.title = "Radio Iqra BF 96.1 MHz | La Voix du Saint Coran";
+    }
+  }, [playerState]);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -73,22 +60,22 @@ const App: React.FC = () => {
 
     if (playerState === PlayerState.PLAYING || playerState === PlayerState.BUFFERING) {
       audioRef.current.pause();
-      // On vide la source pour stopper le téléchargement du flux en arrière-plan (économie de data)
       audioRef.current.src = "";
       audioRef.current.load();
       setPlayerState(PlayerState.PAUSED);
     } else {
       setError(null);
       setPlayerState(PlayerState.BUFFERING);
-      audioRef.current.src = INFOMANIAK_CONFIG.STREAM_URL;
-      audioRef.current.load();
+      // On rajoute un timestamp pour éviter le cache navigateur sur le flux Infomaniak
+      audioRef.current.src = `${INFOMANIAK_CONFIG.STREAM_URL}?t=${Date.now()}`;
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
       audioRef.current.play().catch(e => {
         console.error("Playback Error:", e);
         setError("Lien de diffusion momentanément indisponible.");
         setPlayerState(PlayerState.PAUSED);
       });
     }
-  }, [playerState]);
+  }, [playerState, volume, isMuted]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +100,7 @@ const App: React.FC = () => {
     } catch (error) {
       setChatMessages(prev => [...prev, { 
         role: 'model', 
-        text: "Désolé, je ne parviens pas à me connecter à mes sources de savoir.", 
+        text: "La bibliothèque spirituelle est temporairement inaccessible. Vérifiez votre connexion internet.", 
         timestamp: new Date() 
       }]);
     } finally {
@@ -134,23 +121,22 @@ const App: React.FC = () => {
 
       <main className={`flex-1 flex flex-col items-center justify-start md:justify-center p-4 md:p-8 transition-all duration-700 overflow-y-auto ${showChat ? 'md:mr-[400px] lg:mr-[450px]' : ''}`}>
         
-        {/* LECTEUR PRINCIPAL */}
         <div className="max-w-md w-full glass-panel rounded-[3.5rem] p-8 md:p-10 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden my-auto border border-amber-500/20">
           <div className="absolute -top-32 -left-32 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px]" />
           
           <div className="relative z-10 text-center mb-8">
             <div className="inline-block relative">
-              <div className={`absolute inset-0 bg-amber-400/20 rounded-full blur-3xl transition-all duration-1000 ${playerState === PlayerState.PLAYING ? 'scale-150 opacity-100' : 'scale-100 opacity-0'}`} />
+              <div className={`absolute inset-0 bg-amber-400/10 rounded-full blur-3xl transition-all duration-1000 ${playerState === PlayerState.PLAYING ? 'scale-150 opacity-100' : 'scale-100 opacity-0'}`} />
               
               <div className="w-52 h-52 md:w-64 md:h-64 rounded-full border-[6px] border-amber-500/30 p-2.5 overflow-hidden bg-emerald-950/80 shadow-2xl transform transition-all duration-500 hover:border-amber-500/60 relative">
                 <img 
                   src="https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png" 
                   alt="Radio Iqra Logo" 
-                  className={`w-full h-full object-cover rounded-full transition-transform duration-[10s] linear infinite ${playerState === PlayerState.PLAYING ? 'rotate-[360deg]' : ''}`}
+                  className={`w-full h-full object-cover rounded-full ${playerState === PlayerState.PLAYING ? 'animate-[spin_20s_linear_infinite]' : ''}`}
                 />
                 <button 
                   onClick={togglePlay}
-                  className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors group"
+                  className="absolute inset-0 flex items-center justify-center bg-black/5 hover:bg-black/20 transition-colors group"
                 >
                   {playerState === PlayerState.BUFFERING ? (
                     <Loader2 className="w-20 h-20 text-amber-400 animate-spin" />
@@ -188,11 +174,23 @@ const App: React.FC = () => {
               </button>
               <input 
                 type="range" min="0" max="100" value={isMuted ? 0 : volume} 
-                onChange={(e) => { const v = parseInt(e.target.value); setVolume(v); if(audioRef.current) audioRef.current.volume = v/100; }}
+                onChange={(e) => { 
+                    const v = parseInt(e.target.value); 
+                    setVolume(v); 
+                    if(audioRef.current) audioRef.current.volume = v/100; 
+                }}
                 className="flex-1 h-2 bg-emerald-950 rounded-lg appearance-none cursor-pointer accent-amber-500 border border-amber-500/20"
               />
               <button 
-                onClick={() => navigator.share?.({title:'Radio Iqra BF', text: 'Écoutez Radio Iqra en direct !', url: window.location.href})} 
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'Radio Iqra BF',
+                      text: 'Écoutez la voix du Saint Coran en direct de Ouagadougou !',
+                      url: window.location.href
+                    });
+                  }
+                }} 
                 className="text-amber-500 hover:text-amber-300 transition-colors p-2"
               >
                 <Share2 className="w-7 h-7" />
@@ -205,16 +203,15 @@ const App: React.FC = () => {
                   <Radio className="w-7 h-7 text-amber-400" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-[10px] uppercase font-black text-amber-500 mb-1 tracking-widest opacity-80 italic">En ce moment</p>
+                  <p className="text-[10px] uppercase font-black text-amber-500 mb-1 tracking-widest opacity-80 italic">Diffusion Infomaniak</p>
                   <p className="font-bold text-amber-50 truncate text-xl tracking-tight leading-tight">{nowPlaying}</p>
-                  <p className="text-[11px] text-amber-200/50 font-bold uppercase tracking-widest">Flux HD Infomaniak</p>
+                  <p className="text-[11px] text-amber-200/50 font-bold uppercase tracking-widest">Qualité HD 128kbps</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* LIENS & PROGRAMMATION */}
         {!showChat && (
           <div className="w-full max-w-md space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 pb-20">
             <div className="grid grid-cols-3 gap-5 px-2">
@@ -231,21 +228,20 @@ const App: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <History className="w-6 h-6 text-amber-500" />
-                  <h2 className="font-black text-amber-100 text-[12px] uppercase tracking-[0.4em]">Programmes & Podcasts</h2>
+                  <h2 className="font-black text-amber-100 text-[12px] uppercase tracking-[0.4em]">Programmation Quotidienne</h2>
                 </div>
                 <div className="h-px flex-1 bg-amber-500/20 ml-6" />
               </div>
               <div className="space-y-4">
                 {INFOMANIAK_CONFIG.PROGRAMS.map(track => (
-                  <a key={track.id} href={track.link} target={track.link !== '#' ? "_blank" : undefined}
-                    className={`flex items-center gap-5 p-5 rounded-[2.2rem] border transition-all duration-300 ${track.isActive ? 'glass-panel border-amber-500/40 shadow-2xl' : 'bg-emerald-950/40 border-transparent hover:bg-amber-500/10 hover:border-amber-500/20'}`}>
+                  <div key={track.id} 
+                    className={`flex items-center gap-5 p-5 rounded-[2.2rem] border transition-all duration-300 ${track.isActive ? 'glass-panel border-amber-500/40 shadow-2xl' : 'bg-emerald-950/40 border-transparent hover:bg-amber-500/10'}`}>
                     <span className="text-[11px] font-black text-amber-500 w-14 text-center bg-amber-500/10 py-1.5 rounded-xl border border-amber-500/20">{track.time}</span>
                     <div className="flex-1 min-w-0">
                       <p className={`text-base font-bold truncate ${track.isActive ? 'text-white' : 'text-emerald-100/70'}`}>{track.title}</p>
                     </div>
-                    {track.link !== '#' && <ExternalLink className="w-5 h-5 text-amber-500/40" />}
                     {track.isActive && <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse shadow-[0_0_15px_#d4af37]" />}
-                  </a>
+                  </div>
                 ))}
               </div>
             </div>
@@ -253,8 +249,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* COMPAGNON IA SIDEBAR */}
-      <aside className={`fixed inset-y-0 right-0 w-full md:w-[400px] lg:w-[450px] bg-[#022c22]/fb backdrop-blur-3xl border-l border-amber-500/20 shadow-2xl transition-transform duration-700 ease-out z-50 flex flex-col ${showChat ? 'translate-x-0' : 'translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 right-0 w-full md:w-[400px] lg:w-[450px] bg-[#022c22]/95 backdrop-blur-3xl border-l border-amber-500/20 shadow-2xl transition-transform duration-700 ease-out z-50 flex flex-col ${showChat ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-8 border-b border-amber-500/10 flex items-center justify-between bg-emerald-950/40">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-2 border border-amber-200/30">
@@ -279,7 +274,7 @@ const App: React.FC = () => {
               </div>
               <div className="space-y-3">
                 <h4 className="font-black uppercase tracking-widest text-lg italic text-amber-100">Paix et Salut</h4>
-                <p className="text-[11px] max-w-[280px] mx-auto font-bold leading-relaxed text-amber-200/40 uppercase tracking-widest">Je suis là pour vous éclairer sur la programmation d'Iqra ou sur les textes sacrés.</p>
+                <p className="text-[11px] max-w-[280px] mx-auto font-bold leading-relaxed text-amber-200/40 uppercase tracking-widest">Posez vos questions sur l'Islam ou la programmation de Radio Iqra.</p>
               </div>
             </div>
           )}
@@ -290,7 +285,7 @@ const App: React.FC = () => {
                 {msg.text}
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="mt-6 pt-5 border-t border-amber-500/10 flex flex-col gap-3">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/70">Sources bibliographiques</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/70">Sources</span>
                     <div className="flex flex-wrap gap-2">
                       {msg.sources.map((s, idx) => s.web && (
                         <a key={idx} href={s.web.uri} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-emerald-950/80 hover:bg-amber-500 hover:text-[#022c22] px-4 py-2 rounded-full text-[10px] font-black transition-all border border-amber-500/20 shadow-lg">
@@ -321,7 +316,7 @@ const App: React.FC = () => {
           <form onSubmit={handleSendMessage} className="relative group">
             <input 
               type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Échangez avec le compagnon..."
+              placeholder="Échangez avec l'IA..."
               className="w-full bg-emerald-950/90 border-2 border-amber-900/40 group-focus-within:border-amber-500/50 rounded-[2.2rem] py-6 pl-8 pr-16 focus:outline-none transition-all placeholder:text-amber-900/60 font-bold text-sm text-amber-50 shadow-inner"
             />
             <button 
@@ -331,11 +326,10 @@ const App: React.FC = () => {
               <Send className="w-6 h-6" />
             </button>
           </form>
-          <p className="text-[10px] text-center text-amber-800 font-black uppercase mt-6 tracking-[0.5em] opacity-40">Propulsé par Gemini 2.5</p>
+          <p className="text-[10px] text-center text-amber-800 font-black uppercase mt-6 tracking-[0.5em] opacity-40">Déployé sur Vercel Edge</p>
         </div>
       </aside>
 
-      {/* FAB Mobile (Toggle Chat) */}
       {!showChat && (
         <button 
           onClick={() => setShowChat(true)}
