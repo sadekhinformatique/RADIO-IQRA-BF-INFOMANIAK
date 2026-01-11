@@ -10,19 +10,15 @@
     <!-- PWA -->
     <link rel="manifest" href="metadata.json">
     <meta name="theme-color" content="#022c22">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png">
 
-    <!-- Open Graph / Facebook / WhatsApp -->
+    <!-- Open Graph / SEO -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://radio-iqra-bf.vercel.app/">
     <meta property="og:title" content="Radio Iqra BF - La Voix du Saint Coran">
     <meta property="og:description" content="Streaming direct HD 96.1 MHz et compagnon spirituel intelligent.">
     <meta property="og:image" content="https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Radio Iqra BF">
-    <meta property="twitter:image" content="https://i.postimg.cc/WzDp64wr/iqra-logo-ok.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -42,8 +38,8 @@
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-arabic { font-family: 'Amiri', serif; }
         
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: var(--gold-accent); border-radius: 10px; }
