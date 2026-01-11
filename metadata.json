@@ -1,0 +1,7 @@
+{
+  "name": "Iqra Radio Companion",
+  "description": "A premium digital radio experience for Radio Iqra BF, featuring live streaming, program schedules, and a Gemini-powered spiritual companion for deep insights into Islamic programming.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
